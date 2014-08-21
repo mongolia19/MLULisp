@@ -126,16 +126,18 @@ namespace MLULisp
                  String expression = FuncBody.Substring(FuncBody.IndexOf(':') + 1);
 
                  String ActualParam = RemoveTopOutArrowBrackets( FuncDef.Substring(funcBodyEnd + 1));
-
+                 
+                 expression = expression.Replace(FuncParam, ActualParam);
+                
                  if (!expression.Contains(FuncName))
                  {
-                     expression = expression.Replace(FuncParam, ActualParam);
+                   
 
-                     return DealExpression(expression);
+                     return DealExpression(expression);//Should be Deal statement here!
                  }
                  else
                  {
-                     return ERROR;
+                     return DealExpression(DealFuncDef(expression));
                  }
 
 
