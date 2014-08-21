@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace MLULisp
 {
@@ -11,9 +12,21 @@ namespace MLULisp
 
         static String[] TokenList = { "+","-","*","/","print" };
 
-        static String[] KeyWords = { "let" };
+        static String[] KeyWords = { "let","defun" };
         private static string ERROR="snyax error";
 
+        public  static Boolean IsNumberString(String testStr)
+        {
+                if (Regex.IsMatch(testStr, "^((\\+|-)\\d)?\\d*$"))
+            {
+                return true;// MessageBox.Show("all is number!");
+            }
+            else
+            {
+                return false;
+            }
+
+        }
         public static ArrayList GetAllVar(ArrayList CodeSections) 
         {
 
@@ -92,7 +105,34 @@ namespace MLULisp
 
         }
 
+        public static String DealFuncDef( String FuncDef) 
+        {
+            if (FuncDef.Contains('<') && FuncDef.Contains('>'))
+            {
+                ///Firstly we need to parse out function name ,paramater,expression,and actual value-- Four parts in all.
 
+                 int funcBodyEnd=get_top_level_end_pair_token(FuncDef, '(', ')');
+                 String FuncBody = FuncDef.Substring(0, funcBodyEnd + 1);
+                 FuncBody = RemoveTopOutBrackets(FuncBody);
+
+                 String FuncName = FuncBody.Substring(0, FuncBody.IndexOf('('));
+                 String FuncParam = FuncBody.Substring(FuncBody.IndexOf('('), FuncBody.IndexOf(')')-FuncBody.IndexOf('(')+1);
+
+                String expression=FuncBody.Substring(FuncBody.IndexOf(':')
+
+            }
+
+            else 
+            {
+
+                return ERROR;
+            
+            
+            }
+        
+        
+        
+        }
         public static String DealExpression(String expression)
 
 
@@ -101,7 +141,7 @@ namespace MLULisp
 
             // should simpily vars then  do the calulations
             ///////////////////////////////
-            if (false==(expression[0].Equals("(")&&expression[expression.Length-1].Equals(")")))
+            if (false==(expression[0].Equals('(')&&expression[expression.Length-1].Equals(')')))
             {
                 return ERROR;
 
@@ -147,6 +187,22 @@ namespace MLULisp
         
         }
 
+        public static String RemoveTopOutBrackets(String exp) /////eg. (2)--->2
+        {
+            if (exp.Length<2)
+            {
+                return exp;
+            }
+            else if (exp[0].Equals('(') && exp[exp.Length-1].Equals(')'))
+            {
+                exp = exp.Substring(0, exp.Length - 1);
+                exp = exp.Substring(1);
+
+            }
+            return exp;
+            
+        
+        }
 
         public static String excuteFun(String basic_expression) 
         {
@@ -156,7 +212,8 @@ namespace MLULisp
 
             if (basic_expression.Length >= 3)
             {
-
+                basic_expression = basic_expression.Substring(0, basic_expression.Length - 1);
+                basic_expression = basic_expression.Substring(1);
 
                 tokens = basic_expression.Split(' ');
 
@@ -182,27 +239,43 @@ namespace MLULisp
 
                 else if (tokens.GetLength(0) == 3)
                 {
-                    if (tokens[0].Equals(TokenList[0]))//add
+                    if (excuteFun( RemoveTopOutBrackets( tokens[2]))!=ERROR&&excuteFun( RemoveTopOutBrackets( tokens[1]))!=ERROR)
                     {
-                        return Convert.ToString(Convert.ToInt32(tokens[2]) + Convert.ToInt32(tokens[1]));
-                    }
-                    else if (tokens[0].Equals(TokenList[1]))//sub
-                    {
-                        return Convert.ToString(Convert.ToInt32(tokens[1]) - Convert.ToInt32(tokens[2]));
-                    }
-                    else if (tokens[0].Equals(TokenList[2]))//multiply
-                    {
-                        return Convert.ToString(Convert.ToInt32(tokens[1]) * Convert.ToInt32(tokens[2]));
-                    }
 
-                    else if (tokens[0].Equals(TokenList[1]))//divide
-                    {
-                        return Convert.ToString(Convert.ToInt32(tokens[1]) / Convert.ToInt32(tokens[2]));
+                        tokens[2] = RemoveTopOutBrackets(tokens[2]);
+                        tokens[1] = (RemoveTopOutBrackets(tokens[1]));
+                        if (tokens[0].Equals(TokenList[0]))//add
+                        {
+                            
+                            
+                            return Convert.ToString(Convert.ToInt32(tokens[2]) + Convert.ToInt32(tokens[1]));
+                            
+                           
+                        }
+                        else if (tokens[0].Equals(TokenList[1]))//sub
+                        {
+                            return Convert.ToString(Convert.ToInt32(tokens[1]) - Convert.ToInt32(tokens[2]));
+                        }
+                        else if (tokens[0].Equals(TokenList[2]))//multiply
+                        {
+                            return Convert.ToString(Convert.ToInt32(tokens[1]) * Convert.ToInt32(tokens[2]));
+                        }
+
+                        else if (tokens[0].Equals(TokenList[1]))//divide
+                        {
+                            return Convert.ToString(Convert.ToInt32(tokens[1]) / Convert.ToInt32(tokens[2]));
+                        }
+                        else
+                        {
+                            return ERROR;
+                        }
                     }
                     else
                     {
                         return ERROR;
                     }
+
+                    
 
                 }
                 else
@@ -214,7 +287,15 @@ namespace MLULisp
             }
             else
             {
-                return ERROR;
+                if (IsNumberString( basic_expression))
+                {
+                    return basic_expression;
+                }
+                else
+                {
+                    return ERROR;
+                }
+                
             }
         }
 
