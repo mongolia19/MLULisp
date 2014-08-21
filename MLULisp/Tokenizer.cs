@@ -137,6 +137,7 @@ namespace MLULisp
                  }
                  else
                  {
+                     expression = RemoveTopOutBrackets(expression);
                      return DealExpression(DealFuncDef(expression));
                  }
 
@@ -164,8 +165,15 @@ namespace MLULisp
             ///////////////////////////////
             if (false==(expression[0].Equals('(')&&expression[expression.Length-1].Equals(')')))
             {
-                return ERROR;
+                if (IsNumberString(expression))
+                {
+                    return expression;
+                }
+                else
+                {
 
+                    return ERROR;
+                }
             }
             else if ( false==excuteFun( expression).Equals(ERROR))
             {
