@@ -12,6 +12,7 @@ namespace MLULisp
 {
     public partial class Form1 : Form
     {
+        static String defun = "defun";
 
         ArrayList codeSeg;
 
@@ -28,7 +29,15 @@ namespace MLULisp
             codeSeg =  Tokenizer.GetCodeSections(SrcFiletextBox.Text);
             for (int i = 0; i < codeSeg.Count; i++)
             {
-                OutputString+=Tokenizer.DealExpression(codeSeg[i].ToString())+"\r\n";
+
+                if (codeSeg[i].ToString().Contains(defun))
+                {
+                    OutputString += Tokenizer.DealFuncDef(codeSeg[i].ToString()) + "\r\n";
+                }
+                else
+                {
+                    OutputString += Tokenizer.DealExpression(codeSeg[i].ToString()) + "\r\n";
+                }
             }
             //OutputString=Tokenizer.excuteFun(codeSeg[0].ToString());
 

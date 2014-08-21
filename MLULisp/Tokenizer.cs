@@ -107,18 +107,37 @@ namespace MLULisp
 
         public static String DealFuncDef( String FuncDef) 
         {
+            if (FuncDef.Contains(KeyWords[1]))
+            {
+                FuncDef = FuncDef.Replace(KeyWords[1], "");
+
+            }
             if (FuncDef.Contains('<') && FuncDef.Contains('>'))
             {
                 ///Firstly we need to parse out function name ,paramater,expression,and actual value-- Four parts in all.
 
                  int funcBodyEnd=get_top_level_end_pair_token(FuncDef, '(', ')');
                  String FuncBody = FuncDef.Substring(0, funcBodyEnd + 1);
-                 FuncBody = RemoveTopOutBrackets(FuncBody);
+                 FuncBody = RemoveTopOutBrackets(FuncBody);  //////here the shape is like: f(x):(exp)
 
                  String FuncName = FuncBody.Substring(0, FuncBody.IndexOf('('));
-                 String FuncParam = FuncBody.Substring(FuncBody.IndexOf('('), FuncBody.IndexOf(')')-FuncBody.IndexOf('(')+1);
+                 String FuncParam =RemoveTopOutBrackets( FuncBody.Substring(FuncBody.IndexOf('('), FuncBody.IndexOf(')')-FuncBody.IndexOf('(')+1));
 
-                String expression=FuncBody.Substring(FuncBody.IndexOf(':')
+                 String expression = FuncBody.Substring(FuncBody.IndexOf(':') + 1);
+
+                 String ActualParam = RemoveTopOutArrowBrackets( FuncDef.Substring(funcBodyEnd + 1));
+
+                 if (!expression.Contains(FuncName))
+                 {
+                     expression = expression.Replace(FuncParam, ActualParam);
+
+                     return DealExpression(expression);
+                 }
+                 else
+                 {
+                     return ERROR;
+                 }
+
 
             }
 
@@ -202,6 +221,23 @@ namespace MLULisp
             return exp;
             
         
+        }
+
+        public static String RemoveTopOutArrowBrackets(String exp) /////eg. (2)--->2
+        {
+            if (exp.Length < 2)
+            {
+                return exp;
+            }
+            else if (exp[0].Equals('<') && exp[exp.Length - 1].Equals('>'))
+            {
+                exp = exp.Substring(0, exp.Length - 1);
+                exp = exp.Substring(1);
+
+            }
+            return exp;
+
+
         }
 
         public static String excuteFun(String basic_expression) 
