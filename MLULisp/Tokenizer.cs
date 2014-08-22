@@ -28,6 +28,24 @@ namespace MLULisp
             }
 
         }
+
+        public static int[] GetMatchlocation(String str,String pattern)
+        {
+          
+            MatchCollection mc =Regex.Matches(str, pattern);
+
+            int[] MatchLocation=new int[mc.Count];
+
+            for (int i = 0; i < mc.Count; i++)
+            {
+                MatchLocation[i]=(mc[i]).Index;
+            }
+
+            return MatchLocation;
+
+
+
+        }
         public static ArrayList GetAllVar(ArrayList CodeSections) 
         {
 
@@ -130,19 +148,44 @@ namespace MLULisp
 
                 ////add a function recode to function list
                 //////////
-                 FuncRecode tempFuncRecode = new FuncRecode(FuncName, FuncDef);
+                 if (FuncList.Count>0)
+                 {
+                     for (int i = 0; i < FuncList.Count; i++)
+                     {
+                         if (((FuncRecode)FuncList[i]).Name.Equals( FuncName))
+                         {
 
-                 tempFuncRecode.
+                         }
+                         else 
+                         {
+                             FuncRecode tempFuncRecode = new FuncRecode(FuncName, FuncDef);
+
+                             FuncList.Add(tempFuncRecode);
+                             break;
+                         }
+                        
+                     }
+
+                 }
+                 else
+                 {
+                     FuncRecode tempFuncRecode = new FuncRecode(FuncName, FuncDef);
+
+                     FuncList.Add(tempFuncRecode);
+                 }
+                
+             
+
                  
                  expression = expression.Replace(FuncParam, ActualParam);
                 
-                 if (!expression.Contains(FuncName))
+                 if (!expression.Contains(FuncName))  ///none recursive
                  {
                    
 
                      return DealExpression(expression);//Should be Deal statement here!
                  }
-                 else
+                 else   /// currying defination
                  {
                      expression = RemoveTopOutBrackets(expression);
                      return DealExpression(DealFuncDef(expression));
@@ -162,6 +205,61 @@ namespace MLULisp
         
         
         }
+
+
+        public static int GetFuncInFuncList(String FuncName, ArrayList Flist) 
+        {
+
+            for (int i = 0; i < Flist.Count; i++)
+            {
+
+                if (((FuncRecode)Flist[i]).Name==FuncName)
+                {
+                    return i;
+                }
+
+            }
+            return -1;/////it means function name does not exist in this list
+
+
+        
+        
+        }
+
+        public static String DealFuncCall(String callStatement) 
+        {////
+          ///////////The form should be :f<><><>...<Param n>
+
+            int FunNameEnd=callStatement.IndexOf('<');
+
+            String ParamString=callStatement.Substring(FunNameEnd);
+
+            ArrayList pList =GetAllParams(ParamString);
+
+            String GetFuncName=callStatement.Substring(0,FunNameEnd);
+
+
+            if (GetFuncInFuncList(GetFuncName, Tokenizer.FuncList) != -1)//find func name in list
+            {
+                int[] fnameEndLocation = GetMatchlocation(callStatement, ":");
+
+                for (int i = 0; i < fnameEndLocation.GetLength(0); i++)
+                {
+                    ReplaceParamN(i,pList[i].ToString());
+                }
+            
+            }
+            else 
+            {
+                return ERROR;
+
+            
+            }
+        
+        
+        }
+
+
         public static String DealExpression(String expression)
 
 

@@ -9,9 +9,9 @@ namespace MLULisp
     class FuncRecode
     {
 
-        String Name { get; set; }
+        public String Name { get; set; }
 
-        String Body { get; set; }
+        public String Body { get; set; }
 
         ArrayList ParamList;
 
