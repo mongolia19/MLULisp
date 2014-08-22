@@ -9,6 +9,7 @@ namespace MLULisp
 {
     class Tokenizer
     {
+        static ArrayList FuncList=new ArrayList();
 
         static String[] TokenList = { "+","-","*","/","print" };
 
@@ -105,7 +106,7 @@ namespace MLULisp
 
         }
 
-        public static String DealFuncDef( String FuncDef) 
+        public static String DealFuncDef( String FuncDef) ////process the defination of function
         {
             if (FuncDef.Contains(KeyWords[1]))
             {
@@ -126,6 +127,12 @@ namespace MLULisp
                  String expression = FuncBody.Substring(FuncBody.IndexOf(':') + 1);
 
                  String ActualParam = RemoveTopOutArrowBrackets( FuncDef.Substring(funcBodyEnd + 1));
+
+                ////add a function recode to function list
+                //////////
+                 FuncRecode tempFuncRecode = new FuncRecode(FuncName, FuncDef);
+
+                 tempFuncRecode.
                  
                  expression = expression.Replace(FuncParam, ActualParam);
                 
