@@ -17,6 +17,7 @@ namespace MLULisp
         ArrayList codeSeg;
 
         String OutputString = "";
+        private String callfun = "callfun";
 
 
         public Form1()
@@ -29,14 +30,18 @@ namespace MLULisp
             codeSeg =  Tokenizer.GetCodeSections(SrcFiletextBox.Text);
             for (int i = 0; i < codeSeg.Count; i++)
             {
-
-                if (codeSeg[i].ToString().Contains(defun))
+               String stateI=  codeSeg[i].ToString();
+                if (stateI.Contains(defun))
                 {
-                    OutputString += Tokenizer.DealFuncDef(codeSeg[i].ToString()) + "\r\n";
+                    OutputString += Tokenizer.DealFuncDef(stateI) + "\r\n";
+                }
+                else if (stateI.Contains(callfun))
+                {
+                    OutputString += Tokenizer.DealFuncCall(stateI) + "\r\n";
                 }
                 else
                 {
-                    OutputString += Tokenizer.DealExpression(codeSeg[i].ToString()) + "\r\n";
+                    OutputString += Tokenizer.DealExpression(stateI) + "\r\n";
                 }
             }
             //OutputString=Tokenizer.excuteFun(codeSeg[0].ToString());

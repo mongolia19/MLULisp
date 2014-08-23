@@ -230,6 +230,13 @@ namespace MLULisp
         {////
           ///////////The form should be :f<><><>...<Param n>
 
+
+            if (callStatement.Contains("callfun "))
+            {
+                callStatement = callStatement.Replace("callfun ", "");
+
+            }
+            
             int FunNameEnd=callStatement.IndexOf('<');
 
             String ParamString=callStatement.Substring(FunNameEnd);
@@ -237,16 +244,25 @@ namespace MLULisp
             ArrayList pList =GetAllParams(ParamString);
 
             String GetFuncName=callStatement.Substring(0,FunNameEnd);
-
-
+         
             if (GetFuncInFuncList(GetFuncName, Tokenizer.FuncList) != -1)//find func name in list
             {
-                int[] fnameEndLocation = GetMatchlocation(callStatement, ":");
+
+                String FuncBody = ((FuncRecode)Tokenizer.FuncList[GetFuncInFuncList(GetFuncName, Tokenizer.FuncList)]).Body;
+                int[] fnameEndLocation = GetMatchlocation(FuncBody, ":");
 
                 for (int i = 0; i < fnameEndLocation.GetLength(0); i++)
                 {
-                    ReplaceParamN(i,pList[i].ToString());
+                    
+                    FuncBody=ReplaceParamN(fnameEndLocation[i],FuncBody,pList[i].ToString());
+
                 }
+
+                ////
+                ///After replacing the formal parameters we can use fundefination handler to deal with the function now
+                /////
+
+                return DealFuncDef(FuncBody);////Now it is a defun statement
             
             }
             else 
@@ -257,6 +273,59 @@ namespace MLULisp
             }
         
         
+        }
+
+        private static String ReplaceParamN(int i, String fBody, String Actualparam)/////(f(x):[you are here]())<p> <--trying to get the p there
+        {
+            String PartOne = fBody.Substring(0, i + 1);
+
+            String LeftPart = fBody.Substring(i+1);////(expression))    without <pi>...<pi+1><pi+2>
+            String ExpressionPart=("("+ LeftPart ) .Substring(0,get_top_level_end_pair_token(("("+LeftPart),'(',')')+1);
+            ExpressionPart = ExpressionPart.Substring(1);
+            String PartThree;///the following parameters 
+
+
+            if (LeftPart.Length - 1 <= get_top_level_end_pair_token(LeftPart, '<', '>'))
+            {
+                PartThree = "";
+            }
+            else
+            {
+                PartThree= LeftPart.Substring(get_top_level_end_pair_token(LeftPart, '<', '>') + 1);///get the following paramters
+            }
+           
+            
+
+            
+
+            String NewfBody = PartOne +ExpressionPart + "<" + Actualparam + ">" + PartThree;
+            //ToBeExtracted=ToBeExtracted.Substring(get_top_level_end_pair_token(ToBeExtracted,'(',')'));/////))<p>
+            //ToBeExtracted = ToBeExtracted.Substring(ToBeExtracted.IndexOf('<'), get_top_level_end_pair_token(ToBeExtracted, '<', '>') - ToBeExtracted.IndexOf('<')+1);
+            //String formParam = RemoveTopOutArrowBrackets(ToBeExtracted);
+            //fBody=fBody.Replace(formParam, Actualparam);
+            
+            return NewfBody;
+        }
+
+        private static ArrayList GetAllParams(string pString)
+        {
+            ArrayList resultList = new ArrayList();
+            while (pString.Length > 0)
+            {
+                String tempParam;
+                tempParam=pString.Substring(pString.IndexOf('<'), get_top_level_end_pair_token(pString, '<', '>') - pString.IndexOf('<')+1);
+                pString = pString.Substring(get_top_level_end_pair_token(pString, '<', '>'));//get the left in the String
+                
+                tempParam = RemoveTopOutArrowBrackets(tempParam);
+                resultList.Add(tempParam);
+                if (pString.Length<=1)
+                {
+                    break;
+                }
+            
+            }
+            return resultList;
+           
         }
 
 
