@@ -10,10 +10,10 @@ namespace MLULisp
     class Tokenizer
     {
         static ArrayList FuncList=new ArrayList();
-
+        static ArrayList VarList = new ArrayList();
         static String[] TokenList = { "+","-","*","/","print" };
 
-        static String[] KeyWords = { "let","defun" };
+        static String[] KeyWords = { "let", "defun", "callfun" };
         private static string ERROR="snyax error";
 
         public  static Boolean IsNumberString(String testStr)
@@ -207,6 +207,70 @@ namespace MLULisp
         }
 
 
+        public static String DealLet(String LetSentence) 
+        {
+            String []TokenSegs;
+            if (LetSentence.Contains(KeyWords[0]))
+            {
+                LetSentence=LetSentence.Replace(KeyWords[0], "").Trim();
+
+                TokenSegs= LetSentence.Split('=');
+                if (TokenSegs.GetLength(0) == 1)
+                {
+                    Tokenizer.VarList.Add(new varRecord(TokenSegs[0], "0"));
+                    return "0";
+                }
+                else
+                {
+                    for (int i = 0; i < TokenSegs.GetLength(0); i++)
+                    {
+                        TokenSegs[i] = TokenSegs[i].Trim();
+
+                    }
+
+                    Tokenizer.VarList.Add(new varRecord(TokenSegs[0], DealExpression(TokenSegs[1])));
+                    return DealExpression(TokenSegs[1]);
+                }
+               
+
+            
+            }
+
+            else
+            {
+                return ERROR;
+            }
+        }
+
+
+        public static String DealStatement(String statement) 
+        {
+            statement = statement.Trim();
+
+            if (statement.Substring(0,3)==KeyWords[0])//let  declear a variable
+            {
+                return DealLet(statement);
+            }
+            else if(statement.Substring(0,5)==KeyWords[1])///defun define a function
+            {
+                return DealFuncDef(statement);
+            
+            }
+            else if (statement.Substring(0, 6) == KeyWords[2])///callfun call a function
+            {
+                return DealFuncCall(statement);
+            }
+            else if(statement.Substring(0,1)=='('.ToString())
+            {
+                return DealExpression(statement);
+            }
+            else
+            {
+                return ERROR;
+            }
+
+        
+        }
         public static int GetFuncInFuncList(String FuncName, ArrayList Flist) 
         {
 
@@ -316,8 +380,14 @@ namespace MLULisp
             {
                 String tempParam;
                 tempParam=pString.Substring(pString.IndexOf('<'), get_top_level_end_pair_token(pString, '<', '>') - pString.IndexOf('<')+1);
-                pString = pString.Substring(get_top_level_end_pair_token(pString, '<', '>'));//get the left in the String
-                
+                if (pString.Length-1== get_top_level_end_pair_token(pString, '<', '>'))
+                {
+                    pString="";
+                }
+                else
+                {
+                    pString = pString.Substring(get_top_level_end_pair_token(pString, '<', '>')+1);//get the left in the String
+                }
                 tempParam = RemoveTopOutArrowBrackets(tempParam);
                 resultList.Add(tempParam);
                 if (pString.Length<=1)
