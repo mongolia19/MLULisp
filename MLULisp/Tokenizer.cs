@@ -282,16 +282,18 @@ namespace MLULisp
             String LeftPart = fBody.Substring(i+1);////(expression))    without <pi>...<pi+1><pi+2>
             String ExpressionPart=("("+ LeftPart ) .Substring(0,get_top_level_end_pair_token(("("+LeftPart),'(',')')+1);
             ExpressionPart = ExpressionPart.Substring(1);
+            LeftPart = LeftPart.Replace(ExpressionPart, "");
             String PartThree;///the following parameters 
 
+            int FirstEndSimbolIndex = get_top_level_end_pair_token(LeftPart, '<', '>');
 
-            if (LeftPart.Length - 1 <= get_top_level_end_pair_token(LeftPart, '<', '>'))
+            if (LeftPart.Length - 1 <=FirstEndSimbolIndex)
             {
                 PartThree = "";
             }
             else
             {
-                PartThree= LeftPart.Substring(get_top_level_end_pair_token(LeftPart, '<', '>') + 1);///get the following paramters
+                PartThree= LeftPart.Substring(FirstEndSimbolIndex + 1);///get the following paramters
             }
            
             
