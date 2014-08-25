@@ -509,7 +509,7 @@ namespace MLULisp
                         String[] TokenSeg = expression.Split(' ');
 
                         String Operation = expression[0].ToString();
-
+                        //should substite variables here
                         if (Operation.Equals(TokenList[0]))//add
                         {
 
@@ -537,7 +537,7 @@ namespace MLULisp
                         }
                     
                     }
-                    return ERROR;
+                    
                 }
             }
             else if ( false==excuteFun( expression).Equals(ERROR))
