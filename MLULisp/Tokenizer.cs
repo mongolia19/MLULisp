@@ -126,9 +126,9 @@ namespace MLULisp
 
         public static String DealFuncDef( String FuncDef) ////process the defination of function
         {
-            if (FuncDef.Contains(KeyWords[1]))
+            if (FuncDef.Substring(0,5).Equals(KeyWords[1]))
             {
-                FuncDef = FuncDef.Replace(KeyWords[1], "");
+                FuncDef = FuncDef.Substring(5);
 
             }
             if (FuncDef.Contains('<') && FuncDef.Contains('>'))
@@ -146,6 +146,9 @@ namespace MLULisp
 
                  String ActualParam = RemoveTopOutArrowBrackets( FuncDef.Substring(funcBodyEnd + 1));
 
+                 ///////////substitution of var and fun
+
+                 ActualParam = DealStatement(ActualParam);
                 ////add a function recode to function list
                 //////////
                  if (FuncList.Count>0)
@@ -246,7 +249,11 @@ namespace MLULisp
         public static String DealStatement(String statement) 
         {
             statement = statement.Trim();
-
+            if (statement.Length < 3)
+            {
+                return statement;
+            }
+            else
             if (statement.Substring(0,3)==KeyWords[0])//let  declear a variable
             {
                 return DealLet(statement);
@@ -443,7 +450,8 @@ namespace MLULisp
                 String leftResult = excuteFun(leftExp);
                 if (leftResult.Equals(ERROR))
                 {
-                    leftResult = DealExpression(leftExp);
+                    //changed
+                    leftResult = DealStatement(leftExp);
 
 
                 }
@@ -451,7 +459,8 @@ namespace MLULisp
 
                 if (rightResult.Equals(ERROR))
                 {
-                    rightResult = DealExpression(RightExp);
+                    //changed
+                    rightResult = DealStatement(RightExp);
                 }
 
 
