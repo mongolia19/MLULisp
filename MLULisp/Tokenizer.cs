@@ -13,7 +13,7 @@ namespace MLULisp
         static ArrayList VarList = new ArrayList();
         static String[] TokenList = { "+","-","*","/","print" };
 
-        static String[] KeyWords = { "let", "defun", "callfun","if" };
+        static String[] KeyWords = { "let", "defun", "callfun","if","set" };
         private static string ERROR="snyax error";
 
         public  static Boolean IsNumberString(String testStr)
@@ -231,8 +231,8 @@ namespace MLULisp
 
                     }
 
-                    Tokenizer.VarList.Add(new varRecord(TokenSegs[0], DealExpression(TokenSegs[1])));
-                    return DealExpression(TokenSegs[1]);
+                    Tokenizer.VarList.Add(new varRecord(TokenSegs[0], DealStatement(TokenSegs[1])));
+                    return ((varRecord)Tokenizer.VarList[VarList.Count-1]).varValue;
                 }
                
 
@@ -245,12 +245,65 @@ namespace MLULisp
             }
         }
 
+        public static int GetVarInVarList(String VarName, ArrayList vList)
+        {
+
+            for (int i = 0; i < vList.Count; i++)
+            {
+
+                if (((varRecord)vList[i]).varName == VarName)
+                {
+                    return i;
+                }
+
+            }
+            return -1;/////it means function name does not exist in this list
+
+
+
+
+        }
+
+        public static String DealSet(String SetSentence)
+        {
+            SetSentence=SetSentence.Replace(KeyWords[4],"").Trim();
+            String[] TokenSegs;
+         
+
+                TokenSegs = SetSentence.Split('=');
+                for (int i = 0; i < TokenSegs.GetLength(0); i++)
+                {
+                    TokenSegs[i] = TokenSegs[i].Trim();
+
+                }
+                int Vindex = GetVarInVarList( TokenSegs[0],Tokenizer.VarList);
+                if (Vindex==-1)
+                {
+                    
+                    return ERROR;
+                }
+                else
+                {
+                   
+
+                    ((varRecord)Tokenizer.VarList[Vindex]).varValue= DealStatement(TokenSegs[1]);
+                    return ((varRecord)Tokenizer.VarList[Vindex]).varValue;
+                }
+
+
+
+    
+        
+        
+        }
+
 
         public static String DealStatement(String statement) 
         {
             statement = statement.Trim();
             if (statement.Length < 3)
             {
+                statement=substituteVar(statement, Tokenizer.VarList);
                 return statement;
             }
             else if(statement.Substring(0,1)=='('.ToString())
@@ -278,7 +331,10 @@ namespace MLULisp
 	        {
                 return DealIf(statement);
 	        }
-            
+            else if (statement.Substring(0,3)==KeyWords[4])// set statement
+	        {
+                return DealSet(statement);
+	        }
             else
             {
                 return ERROR;
@@ -324,10 +380,11 @@ namespace MLULisp
                 {
                     return "0";
                 }
-              
-            
-            
+      
         }
+
+
+
         public static int GetFuncInFuncList(String FuncName, ArrayList Flist) 
         {
 
@@ -510,6 +567,10 @@ namespace MLULisp
 
                         String Operation = expression[0].ToString();
                         //should substite variables here
+
+                        TokenSeg[1]=substituteVar(TokenSeg[1], Tokenizer.VarList);
+                        TokenSeg[2] = substituteVar(TokenSeg[2], Tokenizer.VarList);
+
                         if (Operation.Equals(TokenList[0]))//add
                         {
 
@@ -634,6 +695,8 @@ namespace MLULisp
 
                 if (tokens.GetLength(0) == 1)
                 {
+                    basic_expression=substituteVar(basic_expression, Tokenizer.VarList);
+
                     return basic_expression;
                 }
                 else if (tokens.GetLength(0) == 2)
@@ -657,6 +720,12 @@ namespace MLULisp
 
                         tokens[2] = RemoveTopOutBrackets(tokens[2]);
                         tokens[1] = (RemoveTopOutBrackets(tokens[1]));
+                        /////
+                        ///Substute here
+                        /////
+                        tokens[1]=substituteVar(tokens[1] ,Tokenizer.VarList);
+                        tokens[2] = substituteVar(tokens[2], Tokenizer.VarList);
+
                         if (tokens[0].Equals(TokenList[0]))//add
                         {
                             
@@ -710,6 +779,30 @@ namespace MLULisp
                 }
                 
             }
+        }
+
+        private static string substituteVar(string exp, ArrayList arrayList)
+        {
+
+            if(IsNumberString( exp))
+            {
+                return exp;
+            }
+            else 
+            {
+                for (int i = 0; i < arrayList.Count; i++)
+                {
+
+                    if(((varRecord)arrayList[i]).varName.Equals(exp))
+                    {
+                        return ((varRecord)arrayList[i]).varValue;
+
+                    }
+
+                }
+                return ERROR;     
+            }
+
         }
 
 
