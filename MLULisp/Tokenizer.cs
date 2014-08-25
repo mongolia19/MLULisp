@@ -13,7 +13,7 @@ namespace MLULisp
         static ArrayList VarList = new ArrayList();
         static String[] TokenList = { "+","-","*","/","print" };
 
-        static String[] KeyWords = { "let", "defun", "callfun" };
+        static String[] KeyWords = { "let", "defun", "callfun","if" };
         private static string ERROR="snyax error";
 
         public  static Boolean IsNumberString(String testStr)
@@ -147,7 +147,7 @@ namespace MLULisp
                  String ActualParam = RemoveTopOutArrowBrackets( FuncDef.Substring(funcBodyEnd + 1));
 
                  ///////////substitution of var and fun
-
+                ////Should substute the variables here 
                  ActualParam = DealStatement(ActualParam);
                 ////add a function recode to function list
                 //////////
@@ -253,8 +253,15 @@ namespace MLULisp
             {
                 return statement;
             }
-            else
-            if (statement.Substring(0,3)==KeyWords[0])//let  declear a variable
+            else if(statement.Substring(0,1)=='('.ToString())
+            {
+                return DealExpression(statement);
+            }
+            else if (statement.Substring(0,1)==TokenList[0]||statement.Substring(0,1)==TokenList[1]||statement.Substring(0,1)==TokenList[2]||statement.Substring(0,1)==TokenList[3])
+            {
+                return DealExpression(statement);
+            }
+            else if (statement.Substring(0,3)==KeyWords[0])//let  declear a variable
             {
                 return DealLet(statement);
             }
@@ -263,20 +270,63 @@ namespace MLULisp
                 return DealFuncDef(statement);
             
             }
-            else if (statement.Substring(0, 6) == KeyWords[2])///callfun call a function
+            else if (statement.Substring(0, 7) == KeyWords[2])///callfun call a function
             {
                 return DealFuncCall(statement);
             }
-            else if(statement.Substring(0,1)=='('.ToString())
-            {
-                return DealExpression(statement);
-            }
+            else if (statement.Substring(0,2)==KeyWords[3])///if statement
+	        {
+                return DealIf(statement);
+	        }
+            
             else
             {
                 return ERROR;
             }
 
         
+        }
+
+        private static string DealIf(string expression)
+        {
+
+            expression = expression.Substring(3);
+
+                int FirstleftBracket = expression.IndexOf('(');
+                int FirstRightBracket = get_top_level_end_pair_token(expression, '(', ')');
+
+                String leftExp = expression.Substring(FirstleftBracket, FirstRightBracket - FirstleftBracket + 1);
+
+                String RightExp = expression.Substring(FirstRightBracket + 2);
+
+                String leftResult = excuteFun(leftExp);
+                if (leftResult.Equals(ERROR))
+                {
+                    //changed
+                    leftResult = DealStatement(leftExp);
+
+
+                }
+
+                if (leftResult != "0")
+                {
+                    String rightResult = excuteFun(RightExp);
+
+                    if (rightResult.Equals(ERROR))
+                    {
+                        //changed
+                        rightResult = DealStatement(RightExp);
+                    }
+                    return rightResult;
+                }
+                else
+                
+                {
+                    return "0";
+                }
+              
+            
+            
         }
         public static int GetFuncInFuncList(String FuncName, ArrayList Flist) 
         {
@@ -324,7 +374,7 @@ namespace MLULisp
 
                 for (int i = 0; i < fnameEndLocation.GetLength(0); i++)
                 {
-                    
+                    //substute variables here
                     FuncBody=ReplaceParamN(fnameEndLocation[i],FuncBody,pList[i].ToString());
 
                 }
@@ -424,7 +474,69 @@ namespace MLULisp
                 }
                 else
                 {
+                    if (expression.Contains('('))
+                    {
+                            String Operation = expression[0].ToString();
 
+                            int FirstleftBracket = expression.IndexOf('(');
+                            int FirstRightBracket = get_top_level_end_pair_token(expression, '(', ')');
+
+                            String leftExp = expression.Substring(FirstleftBracket, FirstRightBracket - FirstleftBracket + 1);
+
+                            String RightExp = expression.Substring(FirstRightBracket + 2);
+
+                            String leftResult = excuteFun(leftExp);
+                            if (leftResult.Equals(ERROR))
+                            {
+                                //changed
+                                leftResult = DealStatement(leftExp);
+
+
+                            }
+                            String rightResult = excuteFun(RightExp);
+
+                            if (rightResult.Equals(ERROR))
+                            {
+                                //changed
+                                rightResult = DealStatement(RightExp);
+                            }
+
+
+                            return DealExpression( Operation + " " + leftResult + " " + rightResult );
+                    }
+                    else
+                    {
+                        String[] TokenSeg = expression.Split(' ');
+
+                        String Operation = expression[0].ToString();
+
+                        if (Operation.Equals(TokenList[0]))//add
+                        {
+
+
+                            return Convert.ToString(Convert.ToInt32(TokenSeg[2]) + Convert.ToInt32(TokenSeg[1]));
+
+
+                        }
+                        else if (Operation.Equals(TokenList[1]))//sub
+                        {
+                            return Convert.ToString(Convert.ToInt32(TokenSeg[1]) - Convert.ToInt32(TokenSeg[2]));
+                        }
+                        else if (Operation.Equals(TokenList[2]))//multiply
+                        {
+                            return Convert.ToString(Convert.ToInt32(TokenSeg[1]) * Convert.ToInt32(TokenSeg[2]));
+                        }
+
+                        else if (Operation.Equals(TokenList[1]))//divide
+                        {
+                            return Convert.ToString(Convert.ToInt32(TokenSeg[1]) / Convert.ToInt32(TokenSeg[2]));
+                        }
+                        else
+                        {
+                            return ERROR;
+                        }
+                    
+                    }
                     return ERROR;
                 }
             }
@@ -515,7 +627,7 @@ namespace MLULisp
             {
                 basic_expression = basic_expression.Substring(0, basic_expression.Length - 1);
                 basic_expression = basic_expression.Substring(1);
-
+                basic_expression = DealStatement(basic_expression);
                 tokens = basic_expression.Split(' ');
 
 
