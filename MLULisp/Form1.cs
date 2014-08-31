@@ -19,7 +19,7 @@ namespace MLULisp
         String OutputString = "";
         private String callfun = "callfun";
 
-
+        private LittleVM vm ;
         public Form1()
         {
             InitializeComponent();
@@ -28,25 +28,28 @@ namespace MLULisp
         private void button1_Click(object sender, EventArgs e)
         {
             codeSeg =  Tokenizer.GetCodeSections(SrcFiletextBox.Text);
-            for (int i = 0; i < codeSeg.Count; i++)
-            {
-               String stateI=  codeSeg[i].ToString();
-                
-               
-               OutputString+= Tokenizer.DealStatement(stateI) + "\r\n";
-                //if (stateI.Contains(defun))
-                //{
-                //    OutputString += Tokenizer.DealFuncDef(stateI) + "\r\n";
-                //}
-                //else if (stateI.Contains(callfun))
-                //{
-                //    OutputString += Tokenizer.DealFuncCall(stateI) + "\r\n";
-                //}
-                //else
-                //{
-                //    OutputString += Tokenizer.DealExpression(stateI) + "\r\n";
-                //}
-            }
+            vm = new LittleVM(codeSeg);
+
+
+            OutputString=vm.Excute();
+            //for (int i = 0; i < codeSeg.Count; i++)
+            //{
+            //   String stateI=  codeSeg[i].ToString();
+            //   OutputString+= Tokenizer.DealStatement(stateI) + "\r\n";
+            //   vm.IncPC();
+            //    //if (stateI.Contains(defun))
+            //    //{
+            //    //    OutputString += Tokenizer.DealFuncDef(stateI) + "\r\n";
+            //    //}
+            //    //else if (stateI.Contains(callfun))
+            //    //{
+            //    //    OutputString += Tokenizer.DealFuncCall(stateI) + "\r\n";
+            //    //}
+            //    //else
+            //    //{
+            //    //    OutputString += Tokenizer.DealExpression(stateI) + "\r\n";
+            //    //}
+            //}
             //OutputString=Tokenizer.excuteFun(codeSeg[0].ToString());
 
             OutputLabel.Text=OutputString;
@@ -58,6 +61,9 @@ namespace MLULisp
 
 
             codeSeg = new ArrayList();
+
+            vm = new LittleVM(codeSeg);
+
         }
     }
 }

@@ -13,7 +13,7 @@ namespace MLULisp
         static ArrayList VarList = new ArrayList();
         static String[] TokenList = { "+","-","*","/","print" };
 
-        static String[] KeyWords = { "let", "defun", "callfun","if","set" };
+        public static String[] KeyWords = { "let", "defun", "callfun", "if", "set", "goto" };
         private static string ERROR="snyax error";
 
         public  static Boolean IsNumberString(String testStr)
@@ -334,13 +334,33 @@ namespace MLULisp
             else if (statement.Substring(0,3)==KeyWords[4])// set statement
 	        {
                 return DealSet(statement);
-	        }
+            }
+            else if (statement.Substring(0,4)==KeyWords[5])
+            {
+                return DealGoto(statement);
+            }
             else
             {
                 return ERROR;
             }
 
         
+        }
+
+        private static string DealGoto(string statement)
+        {
+            statement = statement.Substring(5);
+
+            if (statement.Contains(KeyWords[5]))
+            {
+                return ERROR;
+            }
+            else 
+            {
+                return DealStatement(statement);
+            
+            }
+
         }
 
         private static string DealIf(string expression)
