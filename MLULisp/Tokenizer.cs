@@ -13,7 +13,7 @@ namespace MLULisp
         static ArrayList VarList = new ArrayList();
         static String[] TokenList = { "+","-","*","/","print" };
 
-        public static String[] KeyWords = { "let", "defun", "callfun", "if", "set", "goto" };
+        public static String[] KeyWords = { "let", "defun", "callfun", "if", "set", "goto" ,"begin"};
         private static string ERROR="snyax error";
 
         public  static Boolean IsNumberString(String testStr)
@@ -297,10 +297,50 @@ namespace MLULisp
         
         }
 
+        public static String DealBegin(String expression)
+        {
+
+            expression = expression.Substring(5);
+
+            int FirstleftBracket = expression.IndexOf('(');
+            int FirstRightBracket = get_top_level_end_pair_token(expression, '(', ')');
+
+            String leftExp = expression.Substring(FirstleftBracket, FirstRightBracket - FirstleftBracket + 1);
+
+            String RightExp = expression.Substring(FirstRightBracket + 2);
+
+            String leftResult = excuteFun(leftExp);
+            if (leftResult.Equals(ERROR))
+            {
+                //changed
+                leftResult = DealStatement(leftExp);
+
+
+            }
+                
+            String rightResult = excuteFun(RightExp);
+
+                
+            if (rightResult.Equals(ERROR))
+                
+            {
+                    //changed
+                    rightResult = DealStatement(RightExp);
+                
+            }
+                
+            return rightResult;
+            
+       
+
+
+        }
+
 
         public static String DealStatement(String statement) 
         {
             statement = statement.Trim();
+           
             if (statement.Length < 3)
             {
                 statement=substituteVar(statement, Tokenizer.VarList);
@@ -308,6 +348,7 @@ namespace MLULisp
             }
             else if(statement.Substring(0,1)=='('.ToString())
             {
+               
                 return DealExpression(statement);
             }
             else if (statement.Substring(0,1)==TokenList[0]||statement.Substring(0,1)==TokenList[1]||statement.Substring(0,1)==TokenList[2]||statement.Substring(0,1)==TokenList[3])
@@ -323,8 +364,9 @@ namespace MLULisp
                 return DealFuncDef(statement);
             
             }
-            else if (statement.Substring(0, 7) == KeyWords[2])///callfun call a function
+            else if (statement.Length>=7&& statement.Substring(0, 7) == KeyWords[2])///callfun call a function
             {
+              
                 return DealFuncCall(statement);
             }
             else if (statement.Substring(0,2)==KeyWords[3])///if statement
@@ -335,14 +377,20 @@ namespace MLULisp
 	        {
                 return DealSet(statement);
             }
-            else if (statement.Substring(0,4)==KeyWords[5])
+            else if (statement.Substring(0,4)==KeyWords[5])//goto statement
             {
                 return DealGoto(statement);
             }
-            else
+            else if (statement.Substring(0,5)==KeyWords[6])//begin statement
             {
-                return ERROR;
+                return DealBegin(statement);
             }
+            else 
+	        {
+                statement=substituteVar(statement, Tokenizer.VarList);
+                return statement;
+	        }
+          
 
         
         }
@@ -372,9 +420,17 @@ namespace MLULisp
                 int FirstRightBracket = get_top_level_end_pair_token(expression, '(', ')');
 
                 String leftExp = expression.Substring(FirstleftBracket, FirstRightBracket - FirstleftBracket + 1);
+                
+                
+                String MidAndRight = expression.Substring(FirstRightBracket + 2);
+                
+                FirstleftBracket=MidAndRight.IndexOf('(');
+                FirstRightBracket=get_top_level_end_pair_token(MidAndRight, '(', ')');
+                String MidStateMent = MidAndRight.Substring(FirstleftBracket, FirstRightBracket - FirstleftBracket + 1);
 
-                String RightExp = expression.Substring(FirstRightBracket + 2);
+                String RightStateMent = MidAndRight.Substring(FirstRightBracket + 2);
 
+                
                 String leftResult = excuteFun(leftExp);
                 if (leftResult.Equals(ERROR))
                 {
@@ -386,19 +442,26 @@ namespace MLULisp
 
                 if (leftResult != "0")
                 {
-                    String rightResult = excuteFun(RightExp);
+                    String MidResult = excuteFun(MidStateMent);
 
-                    if (rightResult.Equals(ERROR))
+                    if (MidResult.Equals(ERROR))
                     {
                         //changed
-                        rightResult = DealStatement(RightExp);
+                        MidResult = DealStatement(MidStateMent);
                     }
-                    return rightResult;
+                    return MidResult;
                 }
                 else
-                
                 {
-                    return "0";
+                    String RightResult = excuteFun(RightStateMent);
+
+                    if (RightResult.Equals(ERROR))
+                    {
+                        //changed
+                        RightResult = DealStatement(RightStateMent);
+                    }
+                    return RightResult;
+                    
                 }
       
         }
@@ -621,45 +684,50 @@ namespace MLULisp
                     
                 }
             }
-            else if ( false==excuteFun( expression).Equals(ERROR))
+            else 
             {
-                return excuteFun(expression);
-            }
-            else
-            {
-                ///////remove the top top brackets
-                expression = expression.Substring(0, expression.Length - 1);
-                expression = expression.Substring(1);
-
-                String Operation = expression[0].ToString();
-
-                int FirstleftBracket = expression.IndexOf('(');
-                int FirstRightBracket = get_top_level_end_pair_token(expression, '(', ')');
-
-                String leftExp = expression.Substring(FirstleftBracket, FirstRightBracket - FirstleftBracket + 1);
-
-                String RightExp = expression.Substring(FirstRightBracket + 2);
-
-                String leftResult = excuteFun(leftExp);
-                if (leftResult.Equals(ERROR))
+                String tempResult=excuteFun( expression);
+                if ( false==tempResult.Equals(ERROR))
                 {
-                    //changed
-                    leftResult = DealStatement(leftExp);
+                    return tempResult;
+                }
+                else
+                {
+                    ///////remove the top top brackets
+                    expression = expression.Substring(0, expression.Length - 1);
+                    expression = expression.Substring(1);
 
+                    String Operation = expression[0].ToString();
+
+                    int FirstleftBracket = expression.IndexOf('(');
+                    int FirstRightBracket = get_top_level_end_pair_token(expression, '(', ')');
+
+                    String leftExp = expression.Substring(FirstleftBracket, FirstRightBracket - FirstleftBracket + 1);
+
+                    String RightExp = expression.Substring(FirstRightBracket + 2);
+
+                    String leftResult = excuteFun(leftExp);
+                    if (leftResult.Equals(ERROR))
+                    {
+                        //changed
+                        leftResult = DealStatement(leftExp);
+
+
+                    }
+                    String rightResult = excuteFun(RightExp);
+
+                    if (rightResult.Equals(ERROR))
+                    {
+                        //changed
+                        rightResult = DealStatement(RightExp);
+                    }
+
+
+                    return DealExpression("(" + Operation + " " + leftResult + " " + rightResult + ")");
 
                 }
-                String rightResult = excuteFun(RightExp);
-
-                if (rightResult.Equals(ERROR))
-                {
-                    //changed
-                    rightResult = DealStatement(RightExp);
-                }
-
-
-                return DealExpression("(" + Operation + " " + leftResult + " " + rightResult + ")");
-
             }
+          
         
         
         }
