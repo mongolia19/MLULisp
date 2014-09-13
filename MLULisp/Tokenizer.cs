@@ -11,9 +11,9 @@ namespace MLULisp
     {
         static ArrayList FuncList=new ArrayList();
         static ArrayList VarList = new ArrayList();
-        static String[] TokenList = { "+","-","*","/","print" };
+        static String[] TokenList = { "+","-","*","/","'" };
 
-        public static String[] KeyWords = { "let", "defun", "callfun", "if", "set", "goto" ,"begin"};
+        public static String[] KeyWords = { "let", "defun", "callfun", "if", "set", "goto" ,"begin","print"};
         private static string ERROR="snyax error";
 
         public  static Boolean IsNumberString(String testStr)
@@ -385,6 +385,10 @@ namespace MLULisp
             {
                 return DealBegin(statement);
             }
+            else if(statement.Substring(0,5)==KeyWords[7])//print statement
+            {
+                return DealPrint(statement);
+            }
             else 
 	        {
                 statement=substituteVar(statement, Tokenizer.VarList);
@@ -393,6 +397,47 @@ namespace MLULisp
           
 
         
+        }
+
+        private static string DealPrint(string statement)
+        {
+            statement = statement.Substring(6);
+
+            int FirstleftBracket = statement.IndexOf('(');
+            int FirstRightBracket = get_top_level_end_pair_token(statement, '(', ')');
+
+            String leftExp = statement.Substring(FirstleftBracket, FirstRightBracket - FirstleftBracket + 1);
+
+            String RightExp = statement.Substring(FirstRightBracket + 2);
+
+            String leftResult = excuteFun(leftExp);
+            if (leftResult.Equals(ERROR))
+            {
+                //changed
+                leftResult = DealStatement(leftExp);
+                if (leftResult.Equals(ERROR))
+                {
+                    leftResult= leftExp;
+                }
+              
+
+            }
+
+            String rightResult = excuteFun(RightExp);
+
+
+            if (rightResult.Equals(ERROR))
+            {
+                //changed
+                rightResult = DealStatement(RightExp);
+                if (rightResult.Equals(ERROR))
+                {
+                    rightResult = RightExp;
+                }
+            }
+
+            return "->" + leftResult + rightResult;
+      
         }
 
         private static string DealGoto(string statement)
@@ -698,7 +743,23 @@ namespace MLULisp
                     expression = expression.Substring(1);
 
                     String Operation = expression[0].ToString();
+                    Boolean opVaildFlag = false;
+                    for (int i = 0; i < TokenList.GetLength(0); i++)
+                    {
+                        if (Operation.Equals(TokenList[i]))
+                        {
+                            opVaildFlag = true;
+                        }
+                    }
 
+                    if (!opVaildFlag)
+                    {
+                        return ERROR;
+                    }
+                    if (Operation.Equals(TokenList[4]))
+                    {
+                        return expression.Substring(1);
+                    }
                     int FirstleftBracket = expression.IndexOf('(');
                     int FirstRightBracket = get_top_level_end_pair_token(expression, '(', ')');
 
