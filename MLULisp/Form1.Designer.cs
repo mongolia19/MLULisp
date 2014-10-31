@@ -33,6 +33,8 @@
             this.SrcFiletextBox = new System.Windows.Forms.TextBox();
             this.CMDtextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.DebugDataGridView = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.DebugDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -81,11 +83,21 @@
             this.label1.TabIndex = 4;
             this.label1.Text = "Output:";
             // 
+            // DebugDataGridView
+            // 
+            this.DebugDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.DebugDataGridView.Location = new System.Drawing.Point(791, 38);
+            this.DebugDataGridView.Name = "DebugDataGridView";
+            this.DebugDataGridView.RowTemplate.Height = 23;
+            this.DebugDataGridView.Size = new System.Drawing.Size(185, 478);
+            this.DebugDataGridView.TabIndex = 6;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(794, 578);
+            this.ClientSize = new System.Drawing.Size(988, 574);
+            this.Controls.Add(this.DebugDataGridView);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.CMDtextBox);
             this.Controls.Add(this.SrcFiletextBox);
@@ -94,6 +106,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.DebugDataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -106,6 +119,7 @@
         private System.Windows.Forms.TextBox SrcFiletextBox;
         private System.Windows.Forms.TextBox CMDtextBox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.DataGridView DebugDataGridView;
     }
 }
 

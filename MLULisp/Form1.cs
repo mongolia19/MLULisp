@@ -29,8 +29,16 @@ namespace MLULisp
         {
             codeSeg =  Tokenizer.GetCodeSections(SrcFiletextBox.Text);
             vm = new LittleVM(codeSeg);
+            DebugDataGridView.Columns.Clear();
+            DebugDataGridView.Columns.Add("codeCol","src");
 
-
+            DebugDataGridView.Rows.Clear();
+            //DebugDataGridView.DataSource = codeSeg;
+            for (int i = 0; i < codeSeg.Count; i++)
+            {
+                DebugDataGridView.Rows.Add();
+                DebugDataGridView.Rows[i].Cells[0].Value = codeSeg[i].ToString();
+            }
             OutputString=vm.Excute();
             //for (int i = 0; i < codeSeg.Count; i++)
             //{

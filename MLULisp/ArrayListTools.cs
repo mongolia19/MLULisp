@@ -9,7 +9,24 @@ namespace MLULisp
     class ArrayListTools
     {
 
+        public static ArrayList StateMentCleaner(ArrayList arr) ///remove spaces and \r\n s and empty ones
+        {
 
+            for (int i = 0; i < arr.Count; i++)
+            {
+                arr[i] = arr[i].ToString().Trim().Replace("\r\n", "");
+                if (arr[i].ToString().Length <= 0)
+                {
+
+                    arr.RemoveAt(i);
+
+                
+                }
+            }
+
+            return arr;
+
+        }
         public static ArrayList StringArrayToArrayList(String[] array) 
         {
             ArrayList List = new ArrayList();

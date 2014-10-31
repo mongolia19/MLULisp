@@ -62,6 +62,7 @@ namespace MLULisp
             ArrayList sections = new ArrayList();
 
             sections = ArrayListTools.StringArrayToArrayList(sectionArray);
+            sections = ArrayListTools.StateMentCleaner(sections);
 
             return sections;
 
