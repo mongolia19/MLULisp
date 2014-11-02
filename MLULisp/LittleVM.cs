@@ -32,18 +32,18 @@ namespace MLULisp
                     ProgramPointer = Convert.ToInt32(Tokenizer.DealStatement(stateI));
                    
                 }
-                else if (stateI.Substring(1,2).Equals(Tokenizer.KeyWords[3]))//if
+                else if (stateI.Substring(1,2).Equals(Tokenizer.KeyWords[3]))//if  
                 {
                         String result= Tokenizer.DealStatement(stateI);
-                        if (result.Equals("0"))
+                        output += result + "\r\n";   
+                    if (result.Equals("0"))/////if exp value is 0 then move to next line else move to the line next to next line
 	                {
-		                IncPC();
+		           
 	                }
                         else
 	                {
-                        output += result + "\r\n";
-                        IncPC();
-                        IncPC();
+                      
+                       
 	                }
                    
                 }

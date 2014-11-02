@@ -34,7 +34,9 @@
             this.CMDtextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.DebugDataGridView = new System.Windows.Forms.DataGridView();
+            this.VarlistDataGridView = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.DebugDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.VarlistDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -86,17 +88,27 @@
             // DebugDataGridView
             // 
             this.DebugDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DebugDataGridView.Location = new System.Drawing.Point(791, 38);
+            this.DebugDataGridView.Location = new System.Drawing.Point(746, 38);
             this.DebugDataGridView.Name = "DebugDataGridView";
             this.DebugDataGridView.RowTemplate.Height = 23;
-            this.DebugDataGridView.Size = new System.Drawing.Size(185, 478);
+            this.DebugDataGridView.Size = new System.Drawing.Size(141, 478);
             this.DebugDataGridView.TabIndex = 6;
+            // 
+            // VarlistDataGridView
+            // 
+            this.VarlistDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.VarlistDataGridView.Location = new System.Drawing.Point(893, 38);
+            this.VarlistDataGridView.Name = "VarlistDataGridView";
+            this.VarlistDataGridView.RowTemplate.Height = 23;
+            this.VarlistDataGridView.Size = new System.Drawing.Size(141, 478);
+            this.VarlistDataGridView.TabIndex = 7;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(988, 574);
+            this.ClientSize = new System.Drawing.Size(1044, 552);
+            this.Controls.Add(this.VarlistDataGridView);
             this.Controls.Add(this.DebugDataGridView);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.CMDtextBox);
@@ -107,6 +119,7 @@
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.DebugDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.VarlistDataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -120,6 +133,7 @@
         private System.Windows.Forms.TextBox CMDtextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DataGridView DebugDataGridView;
+        private System.Windows.Forms.DataGridView VarlistDataGridView;
     }
 }
 

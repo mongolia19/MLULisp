@@ -9,8 +9,12 @@ namespace MLULisp
 {
     class Tokenizer
     {
-        static ArrayList FuncList=new ArrayList();
-        static ArrayList VarList = new ArrayList();
+
+
+
+        public static LittleVM RunningVM;
+       public static ArrayList FuncList=new ArrayList();
+       public static ArrayList VarList = new ArrayList();
         static String[] TokenList = { "+","-","*","/","'" };
 
         public static String[] KeyWords = { "let", "defun", "callfun", "if", "set", "goto" ,"begin","print"};
@@ -298,7 +302,7 @@ namespace MLULisp
         
         }
 
-        public static String DealBegin(String expression)
+        public static String DealBegin(String expression)//begin (exp) (exp)
         {
 
             expression = expression.Substring(5);
@@ -341,10 +345,19 @@ namespace MLULisp
         public static String DealStatement(String statement) 
         {
             statement = statement.Trim();
-           
+            if (IsNumberString( statement))
+            {
+                
+                return statement;
+            }
             if (statement.Length < 3)
             {
                 statement=substituteVar(statement, Tokenizer.VarList);
+                return statement;
+            }
+            else if (statement.Substring(0, 1) != '('.ToString() && (!statement.Contains(" ")))
+            {
+                statement = substituteVar(statement, Tokenizer.VarList);
                 return statement;
             }
             else if(statement.Substring(0,1)=='('.ToString())
@@ -451,7 +464,10 @@ namespace MLULisp
             }
             else 
             {
-                return DealStatement(statement);
+                string tempR = DealStatement(statement);
+                RunningVM.ProgramPointer = Convert.ToInt32(tempR);
+
+                return tempR;
             
             }
 
@@ -495,6 +511,7 @@ namespace MLULisp
                         //changed
                         MidResult = DealStatement(MidStateMent);
                     }
+                    RunningVM.IncPC();
                     return MidResult;
                 }
                 else
@@ -506,6 +523,9 @@ namespace MLULisp
                         //changed
                         RightResult = DealStatement(RightStateMent);
                     }
+                    RunningVM.IncPC();
+                    RunningVM.IncPC();
+
                     return RightResult;
                     
                 }
